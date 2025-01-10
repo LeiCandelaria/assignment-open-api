@@ -4,9 +4,12 @@ import { AppService } from './app.service';
 import { OcrService } from './ocr/ocr.service';
 import { OcrController } from './ocr/ocr.controller';
 import { AuthMiddleware } from './auth/auth.middleware';
+import { OcrModule } from './ocr/ocr.module';
+import { OcrModule } from './ocr/ocr.module';
+import { OcrModule } from './ocr/ocr.module';
 
 @Module({
-  imports: [],
+  imports: [AppModule, OcrModule],
   controllers: [AppController, OcrController],
   providers: [AppService, OcrService],
 })
