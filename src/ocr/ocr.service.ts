@@ -10,7 +10,7 @@ export class OcrService {
   private readonly apiUrl = 'https://ocr-wizard.p.rapidapi.com';
   private readonly apiKey = '1d8a8657b7msh02606aec15e19bdp1e15a0jsn14ff54f5a615';
 
-  async extractTextsFromImage(imageUrl: string): Promise<any> {
+  async extractTextsFromImage(imageUrl: string): Promise<any> { // extracting text from images//
     return new Promise((resolve, reject) => {
       const options = {
         method: 'POST',
@@ -47,7 +47,7 @@ export class OcrService {
     });
   }
   
-    async extractTextsFromPdf(pdfFilePath: string): Promise<any> {
+    async extractTextsFromPdf(pdfFilePath: string): Promise<any> {  // extracting text from PDF Files//
     return new Promise((resolve, reject) => {
       const form = new FormData();
       form.append('file', fs.createReadStream(pdfFilePath));
