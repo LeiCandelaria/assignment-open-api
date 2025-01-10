@@ -6,7 +6,7 @@ import { OcrController } from './ocr/ocr.controller';
 import { AuthMiddleware } from './auth/auth.middleware';
 
 @Module({
-  imports: [OcrService],
+  imports: [],
   controllers: [AppController, OcrController],
   providers: [AppService, OcrService],
 })
