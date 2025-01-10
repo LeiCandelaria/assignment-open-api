@@ -5,13 +5,11 @@ import { OcrService } from './ocr.service';
 export class OcrController {
   constructor(private readonly ocrService: OcrService) {}
 
-  @Post('extract-text')
-  async extractText(@Body('imageUrl') imageUrl: string) {
-    return this.ocrService.extractTextFromImage(imageUrl);
-  }
-
-  @Post('extract-pdf')
-  async extractPdf(@Body('pdfUrl') pdfUrl: string) {
-    return this.ocrService.extractTextFromPdf(pdfUrl);
+  @Post('process')
+  async processImage(@Body('imageUrl') imageUrl: string) {
+    if (!imageUrl) {
+      throw new Error('Image URL is required.');
+    }
+    return await this.ocrService.processImage(imageUrl);
   }
 }
