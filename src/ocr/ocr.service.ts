@@ -4,12 +4,12 @@ import axios from 'axios';
 @Injectable()
 export class OcrService {
   private readonly apiUrl = 'https://ocr-wizard.p.rapidapi.com';
-  private readonly apiKey = 'a956635aa5msh64d519eeb5cd21bp1876dcjsn35c507c13e28'; // the given API key//
-  async processImage(imageUrl: string): Promise<any> {
+  private readonly apiKey = 'a956635aa5msh64d519eeb5cd21bp1876dcjsn35c507c13e28'; // the  given API key//
+  async extractTextsFromImage(imageUrl: string): Promise<any> {
     try {
       const response = await axios.post(
-        `${this.apiUrl}/process`,
-        { image_url: imageUrl },
+        `${this.apiUrl}/extract`,
+        { imageUrl },
         {
           headers: {
             'Content-Type': 'application/json',
@@ -20,7 +20,7 @@ export class OcrService {
       );
       return response.data;
     } catch (error) {
-      throw new Error(`Error processing image: ${error.message}`);
+      throw new Error(`EFailed to extract text from image : ${error.message}`);
     }
   }
 }
