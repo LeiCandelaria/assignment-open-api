@@ -8,7 +8,7 @@ import * as FormData from 'form-data';
 @Injectable()
 export class OcrService {
   private readonly apiUrl = 'https://ocr-wizard.p.rapidapi.com';
-  private readonly apiKey = '1d8a8657b7msh02606aec15e19bdp1e15a0jsn14ff54f5a615';
+  private readonly apiKey = '3125b455b2mshebb4d7a29de0269p1f9f8djsndedb28c1bd0c';
 
   async extractTextsFromImage(imageUrl: string): Promise<any> { // extracting text from images//
     return new Promise((resolve, reject) => {
