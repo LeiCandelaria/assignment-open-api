@@ -5,7 +5,7 @@ import * as https from 'https';
 @Injectable()
 export class OcrService {
   private readonly apiUrl = 'https://ocr-wizard.p.rapidapi.com';
-  private readonly apiKey = 'a956635aa5msh64d519eeb5cd21bp1876dcjsn35c507c13e28';
+  private readonly apiKey = 'c07ba95489mshf6b2ee4e8a15344p134b2cjsnf807b965533c';
 
   async extractTextsFromImage(imageUrl: string): Promise<any> {
     return new Promise((resolve, reject) => {
