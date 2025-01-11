@@ -1,17 +1,17 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import * as FormData from 'form-data';
+import * as fs from 'fs';
 import axios from 'axios';
-import { pdf2text } from 'pdf2text';  // Ensure you have installed the necessary pdf2text package
+import { pdf2text } from 'pdf2text';  // Ensure you have installed the necessary pdf2text package//
+import franc from 'franc-min'; // Language library//
 
 @Injectable()
 export class OcrService {
-  extractTextFromPdf({ pdfPath }: { pdfPath: string; }) {
-    throw new Error('Method not implemented.');
-  }
-  private readonly apiUrl = 'https://api.ocr.space/parse/image';
+  private readonly apiUrl = 'https://api.ocr.space/parse/image' 
   private readonly apiKey = process.env.api; // Use environment variables for security
+  extractTextFromPdf: any;
 
-  // Extract text from a single image URL
+  // Extract text from a single image URL//
   async extractTextFromImage(imageUrl: string): Promise<any> {
     const formData = new FormData();
     formData.append('url', imageUrl);
@@ -68,4 +68,11 @@ export class OcrService {
     const promises = imageUrls.map((imageUrl) => this.extractTextFromImage(imageUrl));
     return await Promise.all(promises); // Run all promises concurrently
   }
+  
 }
+// Detect the language of the extracted text
+async function detectLanguage(text: string) {
+  const language = franc(text); // Detects language using franc-min
+  return language;
+}
+
