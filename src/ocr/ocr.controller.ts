@@ -1,45 +1,37 @@
-import { Controller, Post, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {Multer} from 'multer';
 import * as fs from 'fs';
-import * as pdfParse from 'pdf-parse';
-import { Multer } from 'multer';
+import { OcrService } from './ocr.service';
 
-
-@Controller('extract-image')
+@Controller('ocr')
 export class OcrController {
-  @Post('pdf')
-  @UseInterceptors(FileInterceptor('file', {
-    storage: Multer({
-      destination: './uploads',  // Specify where to save the uploaded files
-      filename: (req, file, callback) => {
-        // Provide a unique name for the uploaded file
-        const uniqueName = `${Date.now()}-${file.originalname}`;
-        callback(null, uniqueName);
-      }
-    })
-  }))
-  async extractFromPdf(@UploadedFile() file: Multer.File): Promise<{message: string; content:any;}> {
-    if (!file) {
-      throw new BadRequestException('No file uploaded');
-    }
+  constructor(private readonly ocrService: OcrService) {}
 
-    if (file.mimetype !== 'application/pdf') {
-      throw new BadRequestException('Invalid file type. Only PDFs are allowed.');
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: Multer.diskStorage({
+        destination: './uploads', // Directory to save uploaded files
+        filename: (req, file, cb) => {
+          const uniqueName = `${Date.now()}-${file.originalname}`;
+          cb(null, uniqueName);
+        },
+      }),
+    }),
+  )
+  async handleFileUpload(@UploadedFile() file: Multer.File): Promise<{ text: string }> {
+    if (!file) {
+      throw new Error('No file uploaded');
     }
 
     try {
-      const fileBuffer = fs.readFileSync(file.path);
-      const pdfData = await pdfParse(fileBuffer);
-
-      // Clean up the uploaded file after processing
-      fs.unlinkSync(file.path);
-
-      return {
-        message: 'PDF content extracted successfully',
-        content: pdfData.text, // The text content of the PDF
-      };
+      const text = await this.ocrService.processImage(file.path);
+      return { text };
     } catch (error) {
-      throw new BadRequestException('Failed to process the PDF file');
+      throw new Error(`OCR processing failed: ${error.message}`);
+    } finally {
+      fs.unlinkSync(file.path); // Clean up uploaded file
     }
   }
 }
