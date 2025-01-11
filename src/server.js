@@ -34,8 +34,8 @@ mobilenet.load().then(loadedModel => {
 });
 
 // OCR Wizard API configuration
-const OCR_API_URL = 'https://ocr-wizard.p.rapidapi.com/v1/ocr';
-const API_KEY = '1d8a8657b7msh02606aec15e19bdp1e15a0jsn14ff54f5a615'; // RAPID API key
+const OCR_API_URL = 'https://api.ocr.space/parse/image';
+const API_KEY = 'K82599337288957'; // OCR SPACE API key
 
 // GET route for image upload and processing
 app.post('extractTextFromImage', upload.single('image'), async (req, res) => {
