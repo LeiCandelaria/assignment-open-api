@@ -4,7 +4,8 @@ import { OcrService } from './ocr.service';
 import {Multer} from 'multer'
 
 
-@Controller('ocr-backend)
+
+@Controller('parse/image')
 export class OcrController {
   constructor(private readonly ocrService: OcrService) {}
 
@@ -12,7 +13,7 @@ export class OcrController {
   async extractFromImage(@Body('imageUrl') imageUrl: string) {
     return await this.ocrService.extractTextFromImage(imageUrl);
   }
-
+  
   @Post('pdf')
   @UseInterceptors(FileInterceptor('file'))
   async extractFromPdf(@UploadedFile() file:Multer.File) {
