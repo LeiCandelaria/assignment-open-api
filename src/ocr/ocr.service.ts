@@ -27,13 +27,20 @@ export class OcrService {
     }
   }
 
-  async extractTextFromImage(imageUrl: string): Promise<any> {
-    const formData = new FormData();
-    formData.append('url', imageUrl); // Make sure 'url' is the correct field name for the API
-
-    return await this.makeRequest(formData);
+  async extractTextFromImages(imageUrls: string[]): Promise<any[]> {
+    const promises = imageUrls.map((imageUrl) => {
+      const formData = new FormData();
+      formData.append('url', imageUrl);
+      return this.makeRequest(formData); // Create a promise for each image URL
+    });
+    return await Promise.all(promises);  // Run all promises concurrently
   }
-
+  async extractTextFromPdfs(filePaths: string[]): Promise<string[]> {
+    const promises = filePaths.map((filePath) => {
+      return this.extractTextFromPdf(filePath);  // Create a promise for each PDF file
+    });
+    return await Promise.all(promises);  // Run all promises concurrently for pdf//
+  }
   async extractTextFromPdf(pdfPath: string): Promise<string> {
     return new Promise((resolve, reject) => {
       pdf2text(pdfPath, (err, text) => {
@@ -46,6 +53,7 @@ export class OcrService {
     });
   }
 }
+
 function pdf2text(pdfPath: string, arg1: (err: any, text: any) => void) {
   throw new Error('Function not implemented.');
 }
