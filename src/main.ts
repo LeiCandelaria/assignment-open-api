@@ -12,5 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors(); // Enable CORS for cross-origin requests
   await app.listen(8989);
+
 }
+
 bootstrap();

@@ -70,7 +70,7 @@ export class OcrService {
   }
   
 }
-// Detect the language of the extracted text
+// Detect the language of the extracted text//
 async function detectLanguage(text: string) {
   const language = franc(text); // Detects language using franc-min
   return language;
