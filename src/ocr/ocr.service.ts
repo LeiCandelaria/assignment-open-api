@@ -1,32 +1,42 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import axios from 'axios';
 import * as fs from 'fs';
+import * as FormData from 'form-data';
+import axios from 'axios';
 
 @Injectable()
 export class OcrService {
-  private readonly apiKey = ' K82599337288957'; // OCR.Space API key
   private readonly apiUrl = 'https://api.ocr.space/parse/image';
+  private readonly apiKey = process.env.api; // Use environment variables for security
 
-  async processImage(filePath: string): Promise<string> {
+  private async makeRequest(formData: FormData): Promise<any> {
     try {
-      const fileData = fs.createReadStream(filePath);
-
-      const response = await axios.post(this.apiUrl, {
-        file: fileData,
-      }, {
+      const response = await axios.post(this.apiUrl, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          'apikey': this.apiKey,
+          ...formData.getHeaders(),
+          'X-RapidAPI-Host': 'ocr-wizard.p.rapidapi.com',
+          'X-RapidAPI-Key': this.apiKey,
         },
       });
-
-      const parsedText = response.data.ParsedResults[0].ParsedText;
-      return parsedText || 'No text detected';
+      return response.data;
     } catch (error) {
       throw new HttpException(
-        `OCR processing failed: ${error.response?.data?.ErrorMessage || error.message}`,
+        `Failed to process OCR request: ${error.response?.data?.message || error.message}`,
         HttpStatus.BAD_REQUEST,
       );
     }
+  }
+
+  async extractTextFromImage(imageUrl: string): Promise<any> {
+    const formData = new FormData();
+    formData.append('url', imageUrl);
+
+    return await this.makeRequest(formData);
+  }
+
+  async extractTextFromPdf(pdfFilePath: string): Promise<any> {
+    const formData = new FormData();
+    formData.append('file', fs.createReadStream(pdfFilePath));
+
+    return await this.makeRequest(formData);
   }
 }

@@ -8,7 +8,7 @@ import { OcrService } from './ocr.service';
 export class OcrController {
   constructor(private readonly ocrService: OcrService) {}
 
-  @Post('extract-text')
+  @Post('extractTextFromImage')
   @UseInterceptors(
     FileInterceptor('file', {   
       storage: Multer.diskStorage({
@@ -26,7 +26,7 @@ export class OcrController {
     }
 
     try {
-      const text = await this.ocrService.extractTextsFromPdf(file.path);
+      const text = await this.ocrService.extractTextFromImage(file.path);
       return { text };
     } catch (error) {
       throw new Error(`OCR processing failed: ${error.message}`);
@@ -34,4 +34,5 @@ export class OcrController {
       fs.unlinkSync(file.path); // Clean up uploaded file
     }
   }
+
 }
