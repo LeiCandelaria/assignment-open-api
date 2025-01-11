@@ -1,27 +1,45 @@
-import { Controller, Post, Body, HttpException, HttpStatus,Get,Query } from '@nestjs/common';
-import { OcrService } from './ocr.service';
+import { Controller, Post, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import * as fs from 'fs';
+import * as pdfParse from 'pdf-parse';
+import { diskStorage } from 'multer';
 
-@Controller('ocr')
-export class OcrController {
-  constructor(private readonly ocrService: OcrService) {}
-
-  @Get('image')
-  async extractTextFromImage(@Query('url') url: string) {
-    try {
-      const data = await this.ocrService.extractTextsFromImage(url);
-      return data;
-    } catch (error) {
-      throw new Error(`Failed to extract text from image: ${error.message}`);
+@Controller('extract-image')
+export class OcController {
+  @Post('pdf')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './uploads',  // Specify where to save the uploaded files
+      filename: (req, file, callback) => {
+        // Provide a unique name for the uploaded file
+        const uniqueName = `${Date.now()}-${file.originalname}`;
+        callback(null, uniqueName);
+      }
+    })
+  }))
+  async extractFromPdf(@UploadedFile() file: Multer.File): Promise<{ message: string; content: any; }> {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
     }
-  }
 
-  @Get('pdf')
-  async extractTextFromPdf(@Query('path') path: string) {
+    if (file.mimetype !== 'application/pdf') {
+      throw new BadRequestException('Invalid file type. Only PDFs are allowed.');
+    }
+
     try {
-      const data = await this.ocrService.extractTextsFromPdf(path);
-      return data;
+      const fileBuffer = fs.readFileSync(file.path);
+      const pdfData = await pdfParse(fileBuffer);
+
+      // Clean up the uploaded file after processing
+      fs.unlinkSync(file.path);
+
+      return {
+        message: 'PDF content extracted successfully',
+        content: pdfData.text, // The text content of the PDF
+      };
     } catch (error) {
-      throw new Error(`Failed to extract text from PDF: ${error.message}`);
+      throw new BadRequestException('Failed to process the PDF file');
     }
   }
 }
+
