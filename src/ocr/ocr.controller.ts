@@ -1,6 +1,5 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { OcrService } from './ocr.service';
-import{ Multer} from 'multer'
 @Controller('extractTextFromImage') // The controller base route
 export class OcrController {
   constructor(private readonly ocrService: OcrService) {}
