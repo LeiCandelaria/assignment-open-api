@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OcrService {
@@ -8,11 +7,6 @@ export class OcrService {
   private readonly apiKey: string;
   private readonly apiHost: string;
 
-  constructor(private configService: ConfigService) {
-    this.apiUrl = this.configService.get('https://ocrwizard.p.rapidapi.com');
-    this.apiKey = this.configService.get('a956635aa5msh64d519eeb5cd21bp1876dcjsn35c507c13e28');
-    this.apiHost = this.configService.get('ocr-wizard.p.rapidapi.comT');
-  }
 
   async extractTextFromImage(imageUrl: string): Promise<any> {
     try {
