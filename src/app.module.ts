@@ -1,14 +1,15 @@
-import { Module,MiddlewareConsumer } from '@nestjs/common';
-import { OcrController } from './ocr/ocr.controller';
-import { AuthMiddleware } from './auth/auth.middleware';
-import { OcrModule } from './ocr/ocr.module';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { OcrModule } from './ocr/ocr.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(),OcrModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // Makes environment variables globally available//
+    }),
+    OcrModule,
+  ],
+  controllers: [],
+  providers: [],
 })
-export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes('*'); //Applying the middleware to all routes//
-  }
-}
+export class AppModule {}
