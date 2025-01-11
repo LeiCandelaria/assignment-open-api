@@ -8,11 +8,11 @@ import { OcrService } from './ocr.service';
 export class OcrController {
   constructor(private readonly ocrService: OcrService) {}
 
-  @Post('upload')
+  @Post('extract-text')
   @UseInterceptors(
-    FileInterceptor('file', {
+    FileInterceptor('file', {   
       storage: Multer.diskStorage({
-        destination: './uploads', // Directory to save uploaded files
+        destination: './uploads', // Directory to save uploaded files//
         filename: (req, file, cb) => {
           const uniqueName = `${Date.now()}-${file.originalname}`;
           cb(null, uniqueName);
@@ -26,7 +26,7 @@ export class OcrController {
     }
 
     try {
-      const text = await this.ocrService.processImage(file.path);
+      const text = await this.ocrService.extractTextsFromPdf(file.path);
       return { text };
     } catch (error) {
       throw new Error(`OCR processing failed: ${error.message}`);
