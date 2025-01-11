@@ -1,21 +1,44 @@
-import { Injectable, HttpException, HttpStatus} from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import * as FormData from 'form-data';
 import axios from 'axios';
-import {pdf2text} from 'pdf2text'
-
+import { pdf2text } from 'pdf2text';  // Ensure you have installed the necessary pdf2text package
 
 @Injectable()
 export class OcrService {
+  extractTextFromPdf({ pdfPath }: { pdfPath: string; }) {
+    throw new Error('Method not implemented.');
+  }
   private readonly apiUrl = 'https://api.ocr.space/parse/image';
   private readonly apiKey = process.env.api; // Use environment variables for security
 
+  // Extract text from a single image URL
+  async extractTextFromImage(imageUrl: string): Promise<any> {
+    const formData = new FormData();
+    formData.append('url', imageUrl);
+    try {
+      const response = await this.makeRequest(formData);
+      return response;
+    } catch (error) {
+      throw new HttpException(
+        `Failed to process OCR request for image: ${error.message}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  // Extract text from a PDF file (assuming file paths are given)
+  async extractTextsFromPdf(filePaths: string[]): Promise<string[]> {
+    const promises = filePaths.map((filePath) => this.extractTextFromPdfFile(filePath));
+    return await Promise.all(promises); // Run all promises concurrently
+  }
+
+  // Private method to process the OCR request to the OCR API
   private async makeRequest(formData: FormData): Promise<any> {
     try {
       const response = await axios.post(this.apiUrl, formData, {
         headers: {
           ...formData.getHeaders(),
-          'apiUrl': 'https://api.ocr.space/parse/image',
-          'apiKey': this.apiKey, // Ensure this is set correctly
+          apiKey: this.apiKey, // Ensure this is set correctly
         },
       });
       return response.data;
@@ -27,34 +50,22 @@ export class OcrService {
     }
   }
 
-  async extractTextFromImages(imageUrls: string[]): Promise<any[]> {
-    const promises = imageUrls.map((imageUrl) => {
-      const formData = new FormData();
-      formData.append('url', imageUrl);
-      return this.makeRequest(formData); // Create a promise for each image URL
-    });
-    return await Promise.all(promises);  // Run all promises concurrently
-  }
-  async extractTextFromPdfs(filePaths: string[]): Promise<string[]> {
-    const promises = filePaths.map((filePath) => {
-      return this.extractTextFromPdf(filePath);  // Create a promise for each PDF file
-    });
-    return await Promise.all(promises);  // Run all promises concurrently for pdf//
-  }
-  async extractTextFromPdf(pdfPath: string): Promise<string> {
+  // Private method to extract text from a PDF file using pdf2text
+  private async extractTextFromPdfFile(filePath: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      pdf2text(pdfPath, (err, text) => {
+      pdf2text(filePath, (err, text) => {
         if (err) {
-          reject(`Error extracting text from PDF: ${err.message}`);
+          reject(`Failed to extract text from PDF: ${err.message}`);
         } else {
-          resolve(text); // Return the extracted text
+          resolve(text);
         }
       });
     });
   }
-}
 
-function pdf2text(pdfPath: string, arg1: (err: any, text: any) => void) {
-  throw new Error('Function not implemented.');
+  // Extract text from multiple images
+  async extractTextFromImages(imageUrls: string[]): Promise<any[]> {
+    const promises = imageUrls.map((imageUrl) => this.extractTextFromImage(imageUrl));
+    return await Promise.all(promises); // Run all promises concurrently
+  }
 }
-
