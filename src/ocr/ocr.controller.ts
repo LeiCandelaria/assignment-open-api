@@ -2,13 +2,14 @@ import { Controller, Post, UseInterceptors, UploadedFile, BadRequestException } 
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import * as pdfParse from 'pdf-parse';
-import { diskStorage } from 'multer';
+import { Multer } from 'multer';
+
 
 @Controller('extract-image')
-export class OcController {
+export class OcrController {
   @Post('pdf')
   @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
+    storage: Multer({
       destination: './uploads',  // Specify where to save the uploaded files
       filename: (req, file, callback) => {
         // Provide a unique name for the uploaded file
@@ -17,7 +18,7 @@ export class OcController {
       }
     })
   }))
-  async extractFromPdf(@UploadedFile() file: Multer.File): Promise<{ message: string; content: any; }> {
+  async extractFromPdf(@UploadedFile() file: Multer.File): Promise<{message: string; content:any;}> {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
@@ -42,4 +43,3 @@ export class OcController {
     }
   }
 }
-
