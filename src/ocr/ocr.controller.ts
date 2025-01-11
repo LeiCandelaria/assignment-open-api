@@ -4,7 +4,7 @@ import { OcrService } from './ocr.service';
 import {Multer} from 'multer'
 
 
-@Controller('ocr')
+@Controller('ocr-backend)
 export class OcrController {
   constructor(private readonly ocrService: OcrService) {}
 

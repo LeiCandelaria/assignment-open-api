@@ -1,7 +1,8 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import * as fs from 'fs';
+import { Injectable, HttpException, HttpStatus} from '@nestjs/common';
 import * as FormData from 'form-data';
 import axios from 'axios';
+import {pdf2text} from 'pdf2text'
+
 
 @Injectable()
 export class OcrService {
@@ -13,8 +14,8 @@ export class OcrService {
       const response = await axios.post(this.apiUrl, formData, {
         headers: {
           ...formData.getHeaders(),
-          'X-RapidAPI-Host': 'ocr-wizard.p.rapidapi.com',
-          'X-RapidAPI-Key': this.apiKey,
+          'apiUrl': 'https://api.ocr.space/parse/image',
+          'apiKey': this.apiKey, // Ensure this is set correctly
         },
       });
       return response.data;
@@ -28,15 +29,24 @@ export class OcrService {
 
   async extractTextFromImage(imageUrl: string): Promise<any> {
     const formData = new FormData();
-    formData.append('url', imageUrl);
+    formData.append('url', imageUrl); // Make sure 'url' is the correct field name for the API
 
     return await this.makeRequest(formData);
   }
 
-  async extractTextFromPdf(pdfFilePath: string): Promise<any> {
-    const formData = new FormData();
-    formData.append('file', fs.createReadStream(pdfFilePath));
-
-    return await this.makeRequest(formData);
+  async extractTextFromPdf(pdfPath: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      pdf2text(pdfPath, (err, text) => {
+        if (err) {
+          reject(`Error extracting text from PDF: ${err.message}`);
+        } else {
+          resolve(text); // Return the extracted text
+        }
+      });
+    });
   }
 }
+function pdf2text(pdfPath: string, arg1: (err: any, text: any) => void) {
+  throw new Error('Function not implemented.');
+}
+
