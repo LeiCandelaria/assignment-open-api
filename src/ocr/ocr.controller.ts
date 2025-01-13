@@ -1,5 +1,6 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { OcrService } from './ocr.service';
+
 @Controller('extractTextFromImage') // The controller base route
 export class OcrController {
   constructor(private readonly ocrService: OcrService) {}
@@ -23,11 +24,36 @@ export class OcrController {
 
   // Endpoint for extracting text from a PDF file
   @Post('pdf')
-  async extractTextsFromPdf(filePaths: string[]): Promise<string[]> {
-    const promises = filePaths.map((filePath) => this.extractTextFromPdf(filePath));
-    return await Promise.all(promises);
+  async extractTextsFromPdf(@Body('filePaths') filePaths: string[]): Promise<any> {
+    try {
+      const extractedTexts = await this.ocrService.extractTextsFromPdf(filePaths);
+      return {
+        success: true,
+        data: extractedTexts, // Return extracted texts from the PDF files
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message, // Return error message if failure
+      };
+    }
   }
-  extractTextFromPdf(filePath: string): any {
-    throw new Error('Method not implemented.');
+
+  // Endpoint for converting text to a PDF
+  @Post('convert-text-to-pdf')
+  async convertTextToPDF(@Body() body: { text: string; filename: string }): Promise<any> {
+    const { text, filename } = body;
+    if (!text || !filename) {
+      throw new HttpException('Text and filename must be provided', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      await this.ocrService.convertTextToPDF(text, filename);
+      return { message: 'PDF created successfully', filename };
+    } catch (error) {
+      throw new HttpException(
+        `Failed to convert text to PDF: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
