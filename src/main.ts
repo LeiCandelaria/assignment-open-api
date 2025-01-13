@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import * as fs from 'fs';
 import * as path from 'path';
 
+
 async function bootstrap() {
   const uploadDir = path.join(__dirname, '..', 'uploads');
   if (!fs.existsSync(uploadDir)) {
