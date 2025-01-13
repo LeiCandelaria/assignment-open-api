@@ -39,21 +39,4 @@ export class OcrController {
     }
   }
 
-  // Endpoint for converting text to a PDF
-  @Post('convert-text-to-pdf')
-  async convertTextToPDF(@Body() body: { text: string; filename: string }): Promise<any> {
-    const { text, filename } = body;
-    if (!text || !filename) {
-      throw new HttpException('Text and filename must be provided', HttpStatus.BAD_REQUEST);
-    }
-    try {
-      await this.ocrService.convertTextToPDF(text, filename);
-      return { message: 'PDF created successfully', filename };
-    } catch (error) {
-      throw new HttpException(
-        `Failed to convert text to PDF: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
 }
