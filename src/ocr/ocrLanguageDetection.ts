@@ -20,7 +20,7 @@ const config = {
         'apikey': apiKey,
     },
     params: {
-        language: 'eng', // Set to a valid language code
+        language: 'auto', // Set to auto-detect language
     },
 };
 
@@ -28,13 +28,14 @@ const config = {
 axios.post('https://api.ocr.space/parse/image', formData, config)
     .then(response => {
         const originalResults = response.data.ParsedResults[0];
-        // Filter out unwanted fields
+        // Add the detected language to the parsed results
         const filteredResults = {
             ParsedText: originalResults.ParsedText,
-            ErrorMessage: originalResults.ErrorMessage,
-            ErrorDetails: originalResults.ErrorDetails,
+            Language: originalResults.Language || "Language not detected"
         };
-        console.log('Filtered Results:', filteredResults);
+        // Include the language in the ParsedResults field
+        response.data.ParsedResults[0] = filteredResults;
+        console.log('Parsed Results:', response.data.ParsedResults);
     })
     .catch(error => {
         console.error('Error:', error);
